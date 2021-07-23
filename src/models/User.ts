@@ -10,6 +10,11 @@ export interface User {
 };
 
 export const userModel = db.define('users',{
+  companyid: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    primaryKey : true
+  },
   id: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -29,11 +34,14 @@ export const userModel = db.define('users',{
 
 
 export const userRole = db.define('user_roles',{
-  roles: {
-    type: Sequelize.ARRAY(Sequelize.STRING),
+  companyid: {
+    type: Sequelize.STRING,
     allowNull: false,
     primaryKey : true,
-    field: 'roleid',
+    references:{
+      model: userModel,
+      key: 'companyid'
+    },
   },
   userid: {
     type: Sequelize.STRING,
@@ -43,8 +51,19 @@ export const userRole = db.define('user_roles',{
       model: userModel,
       key: 'id'
     },
-  }
+  },
+  roles: {
+    type: Sequelize.ARRAY(Sequelize.STRING),
+    allowNull: false,
+    primaryKey : true,
+    field: 'roleid',
+  },
 });
 
-userRole.belongsTo(userModel, {foreignKey: 'id'} );
-userModel.hasMany(userRole , {foreignKey : 'userid'} );
+userRole.belongsTo(userModel);
+userModel.hasMany(userRole , { 
+  foreignKey:{
+    name: 'companyid',
+    allowNull: false
+  }
+ });

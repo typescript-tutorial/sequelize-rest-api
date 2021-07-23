@@ -9,7 +9,7 @@ export class SqlUserService {
         raw:true,
         include: {
           model: userRole,
-          attributes: ['roles','userid'],
+          attributes: ['roles','userid', 'companyid'],
         },
       })
       .then(data => {
@@ -21,10 +21,11 @@ export class SqlUserService {
   load(id: string): Promise<User> {
     return new Promise<User>((resolve, reject) => {
       userModel.findOne({
-        where: { id },
+        where: { id, companyid: 'tma'},
+        raw:true,
         include: [{
           model: userRole,
-          attributes: ['roles','userid'],
+          attributes: ['roles','userid', 'companyid'],
         }]
       })
       .then(data => {
@@ -40,7 +41,6 @@ export class SqlUserService {
         resolve(data as any);
       })
       .catch(err=>{
-        console.log(err.errors[0].message)
         reject(err)
       });
     });
