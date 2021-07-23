@@ -1,21 +1,31 @@
-import {User, userModel} from '../../models/User';
+import {User, userModel, userRole} from '../../models/User';
 
 export class SqlUserService {
   constructor() {
   }
   all(): Promise<User[]> {
     return new Promise<User[]>((resolve, reject) => {
-      userModel.findAll()
+      userModel.findAll({
+        raw:true,
+        include: {
+          model: userRole,
+          attributes: ['roles','userid'],
+        },
+      })
       .then(data => {
         resolve(data as any)
       })
       .catch(err=> reject(err))
-      });
+    });
   }
   load(id: string): Promise<User> {
     return new Promise<User>((resolve, reject) => {
       userModel.findOne({
-        where: { id }
+        where: { id },
+        include: [{
+          model: userRole,
+          attributes: ['roles','userid'],
+        }]
       })
       .then(data => {
         resolve(data as any)
@@ -29,7 +39,10 @@ export class SqlUserService {
       .then(data => {
         resolve(data as any);
       })
-      .catch(err=> reject(err))
+      .catch(err=>{
+        console.log(err.errors[0].message)
+        reject(err)
+      });
     });
   }
   update(user: User): Promise<number> {

@@ -7,7 +7,7 @@ export interface User {
   email?: string;
   phone?: string;
   dateOfBirth?: Date;
-}
+};
 
 export const userModel = db.define('users',{
   id: {
@@ -25,4 +25,26 @@ export const userModel = db.define('users',{
     type: Sequelize.DATE,
     field: 'dateofbirth'
   }
-})
+});
+
+
+export const userRole = db.define('user_roles',{
+  roles: {
+    type: Sequelize.ARRAY(Sequelize.STRING),
+    allowNull: false,
+    primaryKey : true,
+    field: 'roleid',
+  },
+  userid: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    primaryKey : true,
+    references:{
+      model: userModel,
+      key: 'id'
+    },
+  }
+});
+
+userRole.belongsTo(userModel, {foreignKey: 'id'} );
+userModel.hasMany(userRole , {foreignKey : 'userid'} );
